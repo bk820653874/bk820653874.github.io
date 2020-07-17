@@ -176,6 +176,130 @@
           <div id="js-content" class="content-ll">
             
   
+    <article id="post-Regression" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2020/07/15/Regression/">Theory of Linear Regression</a>
+    </h1>
+  
+
+        
+        <a href="/2020/07/15/Regression/" class="archive-article-date">
+  	<time datetime="2020-07-15T07:17:29.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-07-15</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="Linear-Regression"><a href="#Linear-Regression" class="headerlink" title="Linear Regression"></a>Linear Regression</h1><p>​        回归任务指的是需要我们给定输入，在给定观测数据下对连续的目标输出进行一个预测。线性回归是其中最简单的一种。下面考虑我们此时的 Problem Setting.</p>
+<p>​        输入 $X\in\mathcal{R}^D$, 输出 $Y\in\mathcal{R}$, 数据集表示为: ${(x<em>i,y_i)}</em>{i=1}^n$, Linear Regression 考虑数据的生成模型为:</p>
+<script type="math/tex; mode=display">
+\begin{align}
+​    Y & = f(X ; \mathbf{w}) \\
+      & = w_{0}+w_{1} X_{1}+w_{2} X_{2}+\ldots+w_{D} X_{D} \\
+      & = w^T\bar{X_i}
+\end{align}</script><p>希望在数据集上的所有样本都成立有:</p>
+<script type="math/tex; mode=display">
+\begin{gather}
+    y_i = w^Tx_i \\
+    \Rightarrow Y = Xw
+\end{gather}</script><p>对线性方程组 $Y = Xw$，因为通常 $n &gt; D$ 所以该方程通常是没有解的，此时我们称它为一个 $inconsistent \ system$. 所以我们需要在给定约束条件下求解它的近似解。</p>
+<h2 id="一、几何视角"><a href="#一、几何视角" class="headerlink" title="一、几何视角"></a>一、几何视角</h2><p>​        定义损失函数为：</p>
+<script type="math/tex; mode=display">
+\ell\left(y_{i}, f\left(\mathbf{x}_{i} ; \mathbf{w}\right)\right) = \frac{1}{2}\left(y_{i}-f\left(\mathbf{x}_{i} ; \mathbf{w}\right)\right)^{2}</script><p>在 LR 下的平均损失为：</p>
+<script type="math/tex; mode=display">
+\begin{align}
+L(\mathbf{w}) & = \frac{1}{n} \sum_{i}^{n} \ell\left(y_{i}, f\left(\mathbf{x}_{i} ; \mathbf{w}\right)\right) \\
+            & = \frac{1}{2 n} \sum_{i}^{n}\left(y_{i}-f\left(\mathbf{x}_{i} ; \mathbf{w}\right)\right)^{2} \\
+            & = \frac{1}{2 n} \sum_{i}^{n}\left(y_{i}-\mathbf{w}^{\top} \overline{\mathbf{x}}_{i}\right)^{2} \\
+            & = \frac{1}{2 n}\|\mathbf{y}-\mathbf{X} \mathbf{w}\|^{2}_2
+\end{align}</script><p>所以有,</p>
+<script type="math/tex; mode=display">
+\hat{\mathbf{w}}_{L S} \in \underset{\mathbf{w}}{\operatorname{argmin}} L(\mathbf{w})</script><p>容易通过一阶必要条件求出该解：</p>
+<script type="math/tex; mode=display">
+\hat{\mathbf{w}}_{L S}=\left(\mathbf{X}^{\top} \mathbf{X}\right)^{-1} \mathbf{X}^{\top} \mathbf{y}</script><p>所以预测值为:</p>
+<script type="math/tex; mode=display">
+\hat{\mathbf{y}}=\mathbf{X} \hat{\mathbf{w}}=\mathbf{X}\left(\mathbf{X}^{\top} \mathbf{X}\right)^{-1} \mathbf{X}^{\top} \mathbf{y}</script><h3 id="1-1-几何视角下的解释"><a href="#1-1-几何视角下的解释" class="headerlink" title="1.1 几何视角下的解释"></a>1.1 几何视角下的解释</h3><p>​        我们说，预测值是真实值在 $X$ 行空间上的投影，因为容易导出，上面的约束为:</p>
+<script type="math/tex; mode=display">
+\hat{\mathbf{y}}=\underset{\mathbf{z} \in \mathcal{C}(\mathbf{X})}{\operatorname{argmin}}\|\mathbf{z}-\mathbf{y}\|_{2}</script><p>另一方面的，我们注意到矩阵 $ P = \mathbf{X}\left(\mathbf{X}^{\top} \mathbf{X}\right)^{-1} \mathbf{X}^{\top}$ 是一个投影矩阵，因为它满足两个定义:</p>
+<ol>
+<li>$P^2 = P$</li>
+<li>$ P = P^T$</li>
+</ol>
+<h2 id="二、概率视角"><a href="#二、概率视角" class="headerlink" title="二、概率视角"></a>二、概率视角</h2><pre><code>     概率视角下，我们认为线性回归的解是在线性模型收到了零均值加性高斯噪声下的近似解。此时我们的模型建模为：
+</code></pre><script type="math/tex; mode=display">
+Y = Xw + \epsilon \qquad \epsilon\sim\mathcal{N}(0,\sigma^2)</script><p>所以, $y_i|x_i,w\sim \mathcal{N}(w^T\bar{x_i},\sigma^2)$, 且输入数据是独立同分布的，所以极大似然法下的解为：</p>
+<script type="math/tex; mode=display">
+\begin{align}
+\hat{\mathbf{w}}_{M L} & = \underset{\mathbf{w}}{\operatorname{argmax}} p\left(y_{1}, \ldots, y_{n} \mid \mathbf{x}_{1}, \ldots, \mathbf{x}_{n}, \mathbf{w}, \sigma\right) \\
+    & = \underset{\mathbf{w}}{\operatorname{argmax}} p(\mathbf{y} \mid \mathbf{X}, \mathbf{w}, \sigma)
+\end{align}</script><p>所以似然函数为:</p>
+<script type="math/tex; mode=display">
+L(\mathbf{w}) = p(\mathbf{y} \mid \mathbf{X}, \mathbf{w}, \sigma) = \prod_{i = 1}^{n} p\left(y_{i} \mid \mathbf{x}_{i}, \mathbf{w}, \sigma\right)\\</script><script type="math/tex; mode=display">
+\begin{aligned}
+\log L(\mathbf{w}) &=\sum_{n=1}^{n} \log \left(\frac{1}{\sqrt{2 \pi \sigma^{2}}} \exp \left\{-\frac{1}{2 \sigma^{2}}\left(y_{i}-f\left(\mathbf{x}_{i} ; \mathbf{w}\right)\right)^{2}\right\}\right) \\
+&=-\frac{n}{2} \log 2 \pi-n \log \sigma-\frac{1}{2 \sigma^{2}} \sum_{i=1}^{n}\left(y_{i}-\mathbf{w}^{\top} \overline{\mathbf{x}}_{i}\right)^{2} \\
+&=-\frac{n}{2} \log 2 \pi-n \log \sigma-\frac{1}{2 \sigma^{2}}\|\mathbf{y}-\mathbf{X} \mathbf{w}\|^{2}
+\end{aligned}</script><p>容易解得,</p>
+<script type="math/tex; mode=display">
+\hat{\mathbf{w}}_{ML}=\left(\mathbf{X}^{\top} \mathbf{X}\right)^{-1} \mathbf{X}^{\top} \mathbf{y}</script>
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">笔记</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2020/07/15/Regression/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-测试" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -201,8 +325,8 @@
 <li>2</li>
 <li>3</li>
 </ul>
-<h2 id="Title-2"><a href="#Title-2" class="headerlink" title="Title 2"></a>Title 2</h2><p>$$<br>c^2 = a^2 + b^2<br>$$</p>
-
+<h2 id="Title-2"><a href="#Title-2" class="headerlink" title="Title 2"></a>Title 2</h2><script type="math/tex; mode=display">
+c^2 = a^2 + b^2</script>
       
 
       
@@ -277,16 +401,12 @@
       
         <p>Welcome to <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/" target="_blank" rel="noopener">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html" target="_blank" rel="noopener">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues" target="_blank" rel="noopener">GitHub</a>.</p>
 <h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new <span class="string">"My New Post"</span></span><br></pre></td></tr></table></figure>
-
 <p>More info: <a href="https://hexo.io/docs/writing.html" target="_blank" rel="noopener">Writing</a></p>
 <h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
-
 <p>More info: <a href="https://hexo.io/docs/server.html" target="_blank" rel="noopener">Server</a></p>
 <h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
-
 <p>More info: <a href="https://hexo.io/docs/generating.html" target="_blank" rel="noopener">Generating</a></p>
 <h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
-
 <p>More info: <a href="https://hexo.io/docs/one-command-deployment.html" target="_blank" rel="noopener">Deployment</a></p>
 
       
